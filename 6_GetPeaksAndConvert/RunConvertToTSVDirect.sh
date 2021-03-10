@@ -17,6 +17,6 @@ dimspy hdf5-pm-to-txt \
 --delimiter tab \
 --comprehensive \
 --attribute_name 'intensity' \
---representation-samples rows
+--representation-samples columns
 
 echo "Complete!"
