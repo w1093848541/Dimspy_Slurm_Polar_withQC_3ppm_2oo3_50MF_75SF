@@ -38,7 +38,7 @@ dimspy hdf5-pm-to-txt \
 --output pm.blankFilter.$PBS_JOB \
 --delimiter tab \
 --attribute_name intensity \
---representation-samples rows
+--representation-samples columns
 
 dimspy hdf5-pm-to-txt \
 --input blankFilter.$PBS_JOB \
@@ -46,7 +46,7 @@ dimspy hdf5-pm-to-txt \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples rows
+--representation-samples columns
 
 echo "Conversion of Files Complete"
 echo "Step Complete"
