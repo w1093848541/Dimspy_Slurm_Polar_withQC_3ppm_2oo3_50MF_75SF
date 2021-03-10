@@ -31,7 +31,7 @@ dimspy hdf5-pm-to-txt \
 --output pm.alignSamples.$PBS_JOB \
 --delimiter tab \
 --attribute_name intensity \
---representation-samples rows
+--representation-samples columns
 
 dimspy hdf5-pm-to-txt \
 --input alignSamples.$PBS_JOB \
@@ -39,7 +39,7 @@ dimspy hdf5-pm-to-txt \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples rows
+--representation-samples columns
 
 echo "Conversion Complete"
 echo "Step Complete"
