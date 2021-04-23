@@ -13,7 +13,7 @@ echo "Starting Conversion"
 
 dimspy hdf5-pm-to-txt \
 --input ../5_MissingVals/missingVals.* \
---output convert2TSV.$PBS_JOB \
+--output convert2TSV.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name 'intensity' \

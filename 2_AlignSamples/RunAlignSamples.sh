@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N AlignSamples
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o AlignSamples_%j.log
+#SBATCH -e AlignSamples_%j.err
+#SBATCH --job-name=AlignSamples
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 source ../samples.conf
 cd $MAIN_DIR/2_AlignSamples
 
@@ -18,7 +25,7 @@ echo "Starting to Align"
 
 dimspy align-samples \
 --input ../1b_RepFilter/RepFilter.* \
---output alignSamples.$PBS_JOB \
+--output alignSamples.$SLURM_JOB_ID \
 --ppm $PPM \
 --ncpus $NCPUS
 
@@ -27,24 +34,24 @@ dimspy align-samples \
 echo "Alignment Complete"
 
 dimspy hdf5-pm-to-txt \
---input alignSamples.$PBS_JOB \
---output pm.alignSamples.$PBS_JOB \
+--input alignSamples.$SLURM_JOB_ID \
+--output pm.alignSamples.$SLURM_JOB_ID \
 --delimiter tab \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 dimspy hdf5-pm-to-txt \
---input alignSamples.$PBS_JOB \
---output comp.alignSamples.$PBS_JOB \
+--input alignSamples.$SLURM_JOB_ID \
+--output comp.alignSamples.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 echo "Conversion Complete"
 echo "Step Complete"
 
 echo "Submitting Next Step"
 cd ../3_BlankFilter/
-qsub RunBlankFilter.sh
+sbatch RunBlankFilter.sh
 

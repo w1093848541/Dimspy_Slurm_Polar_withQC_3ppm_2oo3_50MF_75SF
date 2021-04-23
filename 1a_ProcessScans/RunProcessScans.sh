@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N ProcessScans
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH -J ProcessScans
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o ProcessScans_%j.log
+#SBATCH -e ProcessScans_%j.err
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 pwd
 source ../samples.conf
 cd $MAIN_DIR/1a_ProcessScans
@@ -26,7 +33,7 @@ dimspy process-scans \
 --min_scans 3 \
 --min-fraction 0.5 \
 --exclude-scan-events 190.0 1200.0 full \
---report $REPORT_DIR/process_scan_report.$PBS_JOBID \
+--report $REPORT_DIR/process_scan_report.$SLURM_JOB_ID \
 --ncpus $NCPUS
 
 #optional parameters: --rds-threshold, --skip-stitching, --ncpus
@@ -42,4 +49,4 @@ echo "Conversion Complete"
 
 echo "Submitting next job"
 cd ../1b_RepFilter/
-qsub RunReplicateFilter.sh
+sbatch RunReplicateFilter.sh

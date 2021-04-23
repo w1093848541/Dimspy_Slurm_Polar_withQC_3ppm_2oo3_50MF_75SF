@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N BlankFilter
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o BlankFilter_%j.log
+#SBATCH -e BlankFilter_%j.err
+#SBATCH --job-name=BlankFilter
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 source ../samples.conf
 cd $MAIN_DIR/3_BlankFilter
 
@@ -19,7 +26,7 @@ echo "Starting Blank Filter"
 
 dimspy blank-filter \
 --input ../2_AlignSamples/alignSamples.* \
---output blankFilter.$PBS_JOB \
+--output blankFilter.$SLURM_JOB_ID \
 --blank-label 'blank' \
 --min-fraction 1.0 \
 --function mean \
@@ -29,29 +36,29 @@ dimspy blank-filter \
 echo "Blank Filter Complete"
 
 dimspy create-sample-list \
---input blankFilter.$PBS_JOB \
---output  samplelist.blankFilter.$PBS_JOB \
+--input blankFilter.$SLURM_JOB_ID \
+--output  samplelist.blankFilter.$SLURM_JOB_ID \
 --delimiter tab
 
 dimspy hdf5-pm-to-txt \
---input blankFilter.$PBS_JOB \
---output pm.blankFilter.$PBS_JOB \
+--input blankFilter.$SLURM_JOB_ID \
+--output pm.blankFilter.$SLURM_JOB_ID \
 --delimiter tab \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 dimspy hdf5-pm-to-txt \
---input blankFilter.$PBS_JOB \
---output comp.blankFilter.$PBS_JOB \
+--input blankFilter.$SLURM_JOB_ID \
+--output comp.blankFilter.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 echo "Conversion of Files Complete"
 echo "Step Complete"
 
 echo "Submitting Next Step"
 cd ../4_SampleFilter/
-qsub RunSampleFilter.sh
+sbatch RunSampleFilter.sh
 

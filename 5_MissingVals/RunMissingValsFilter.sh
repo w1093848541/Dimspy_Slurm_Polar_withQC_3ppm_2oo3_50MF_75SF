@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N MissingVals
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o MissingValsFilter_%j.log
+#SBATCH -e MissingValsFilter_%j.err
+#SBATCH --job-name=MissingVals
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 source ../samples.conf
 cd $MAIN_DIR/5_MissingVals
 
@@ -18,35 +25,35 @@ echo "Starting Missing Value Filter"
 
 dimspy mv-sample-filter \
 --input ../4_SampleFilter/sampleFilter.* \
---output missingVals.$PBS_JOB \
+--output missingVals.$SLURM_JOB_ID \
 --max-fraction 0.8
 
 echo "Missing Values Filter Complete"
 
 dimspy create-sample-list \
---input missingVals.$PBS_JOB \
---output samplelist.missingVals.$PBS_JOB \
+--input missingVals.$SLURM_JOB_ID \
+--output samplelist.missingVals.$SLURM_JOB_ID \
 --delimiter tab
 
 dimspy hdf5-pm-to-txt \
---input missingVals.$PBS_JOB \
---output pm.missingVals.$PBS_JOB \
+--input missingVals.$SLURM_JOB_ID \
+--output pm.missingVals.$SLURM_JOB_ID \
 --delimiter tab \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 dimspy hdf5-pm-to-txt \
---input missingVals.$PBS_JOB \
---output comp.missingVals.$PBS_JOB \
+--input missingVals.$SLURM_JOB_ID \
+--output comp.missingVals.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 echo "Conversions Complete"
 echo "Step Complete"
 
 echo "Submitting Next Step"
 cd ../6_GetPeaksAndConvert/
-qsub RunGetAvgPeaks.sh
-qsub RunConvertToTSV.sh
+sbatch RunGetAvgPeaks.sh
+sbatch RunConvertToTSV.sh

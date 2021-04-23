@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N ConvertToTSV
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o ConvertToTSV_%j.log
+#SBATCH -e ConvertToTSV_%j.err
+#SBATCH --job-name=ConvertToTSV
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 source ../samples.conf
 cd $MAIN_DIR/6_GetPeaksAndConvert
 
@@ -18,10 +25,10 @@ echo "Starting Conversion"
 
 dimspy hdf5-pm-to-txt \
 --input ../5_MissingVals/missingVals.* \
---output convert2TSV.$PBS_JOB \
+--output convert2TSV.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name 'intensity' \
---representation-samples columns
+--representation-samples rows
 
 echo "Complete!"

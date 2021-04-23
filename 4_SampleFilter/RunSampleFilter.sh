@@ -1,11 +1,18 @@
-#PBS -k oe 
-#PBS -m abe
-#PBS -M youremailhere@gmail.com
-#PBS -N SampleFilter
-#PBS -l nodes=1:ppn=3,vmem=20gb,walltime=2:00:00
+#!/bin/bash
+
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=youremailhere@gmail.com
+#SBATCH -p general
+#SBATCH -o SampleFilter_%j.log
+#SBATCH -e SampleFilter_%j.err
+#SBATCH --job-name=SampleFilter
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=3
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
 
 ##Move to correct WD
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 source ../samples.conf
 cd $MAIN_DIR/4_SampleFilter
 
@@ -18,7 +25,7 @@ echo "Starting Sample Filter"
 
 dimspy sample-filter \
 --input ../3_BlankFilter/blankFilter.* \
---output sampleFilter.$PBS_JOB \
+--output sampleFilter.$SLURM_JOB_ID \
 --min-fraction 0.8
 
 #options to consider: --within, -rsd_threshold
@@ -26,23 +33,23 @@ dimspy sample-filter \
 echo "Sample Filter Complete"
 
 dimspy hdf5-pm-to-txt \
---input sampleFilter.$PBS_JOB \
---output pm.sampleFilter.$PBS_JOB \
+--input sampleFilter.$SLURM_JOB_ID \
+--output pm.sampleFilter.$SLURM_JOB_ID \
 --delimiter tab  \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 dimspy hdf5-pm-to-txt \
---input sampleFilter.$PBS_JOB \
---output comp.sampleFilter.$PBS_JOB \
+--input sampleFilter.$SLURM_JOB_ID \
+--output comp.sampleFilter.$SLURM_JOB_ID \
 --delimiter tab \
 --comprehensive \
 --attribute_name intensity \
---representation-samples columns
+--representation-samples rows
 
 echo "Conversions Complete"
 echo "Step Complete"
 
 echo "Submitting Next Step"
 cd ../5_MissingVals/
-qsub RunMissingValsFilter.sh
+sbatch RunMissingValsFilter.sh

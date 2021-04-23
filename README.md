@@ -49,7 +49,7 @@ you are ready to run! Simply do the following:
 
 `cd 1a_ProcessScans`
 
-`qsub RunProcessScans.sh`
+`sbatch RunProcessScans.sh`
 
 This will output a report to the reports folder, and automatically launch subsequent jobs.  You can 
 restart the pipeline at any point by going to the desired step's directory and submitting the job in 
