@@ -32,7 +32,7 @@ dimspy process-scans \
 --ppm $PPM \
 --min_scans 3 \
 --min-fraction 0.5 \
---exclude-scan-events 190.0 1200.0 full \
+--exclude-scan-events 50.0 620.0 full \
 --report $REPORT_DIR/process_scan_report.$SLURM_JOB_ID \
 --ncpus $NCPUS
 
