@@ -26,7 +26,7 @@ echo "Starting Missing Value Filter"
 dimspy mv-sample-filter \
 --input ../4_SampleFilter/sampleFilter.* \
 --output missingVals.$SLURM_JOB_ID \
---max-fraction 0.8
+--max-fraction 0.2
 
 echo "Missing Values Filter Complete"
 
