@@ -27,10 +27,10 @@ dimspy replicate-filter \
 --input ../1a_ProcessScans/process_scans.out \
 --output RepFilter.$SLURM_JOB_ID \
 --ppm $PPM \
---replicates $REPLICATES \
+--replicates 3 \
 --min-peak-present 3 \
 --report $REPORT_DIR/RepFilterReport.$SLURM_JOB_ID \
---ncpus 3 \
+--ncpus $NCPUS
 
 #other options to consider: --rsd_threshold, --filelist, --report
 echo "Filtering complete, begin conversion of files"
